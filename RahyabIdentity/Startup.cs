@@ -1,0 +1,217 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using IdentityServer4;
+using IdentityServer4.Configuration;
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using RahyabIdentity.Configuration;
+using RahyabIdentity.Infrastructure;
+using RahyabIdentity.Models;
+
+namespace RahyabIdentity
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+            // configures IIS out-of-proc settings (see https://github.com/aspnet/AspNetCore/issues/14882)
+            services.Configure<IISOptions>(iis =>
+            {
+                iis.AuthenticationDisplayName = "Windows";
+                iis.AutomaticAuthentication = false;
+            });
+
+            // configures IIS in-proc settings
+            services.Configure<IISServerOptions>(iis =>
+            {
+                iis.AuthenticationDisplayName = "Windows";
+                iis.AutomaticAuthentication = false;
+            });
+            var connectionString = Configuration["ConnectionString"];
+
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+            services.AddEntityFrameworkSqlServer()
+                .AddDbContext<ApplicationDbContext>(options =>
+                    {
+                        options.UseSqlServer(connectionString,
+                            sqlServerOptionsAction: sqlOptions =>
+                            {
+                                sqlOptions.EnableRetryOnFailure(
+                                    maxRetryCount: 10,
+                                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                                    errorNumbersToAdd: null);
+                            });
+
+                    },
+                    ServiceLifetime
+                        .Scoped //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request));
+                );
+
+
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            var builder = services.AddIdentityServer(options =>
+            {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+
+                options.UserInteraction = new UserInteractionOptions
+                {
+                    LogoutUrl = "/Account/Logout",
+                    LoginUrl = "/Account/Login",
+                    LoginReturnUrlParameter = "returnUrl"
+                };
+            }).AddAspNetIdentity<ApplicationUser
+                >()
+                // .AddSigningCredential(new X509Certificate2(@".\Configuration\blueirvin.com.pfx", "Blu3Irvin.com"))
+                // this adds the config data from DB (clients, resources)
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = db =>
+                        db.UseSqlServer(connectionString,
+                            sql => sql.MigrationsAssembly(migrationsAssembly));
+                })
+                // this adds the operational data from DB (codes, tokens, consents)
+                .AddOperationalStore(options =>
+                {
+                    options.ConfigureDbContext = db =>
+                        db.UseSqlServer(connectionString,
+                            sql => sql.MigrationsAssembly(migrationsAssembly));
+
+                    // this enables automatic token cleanup. this is optional.
+                    options.EnableTokenCleanup = true;
+                    // options.TokenCleanupInterval = 15; // interval in seconds. 15 seconds useful for debugging
+
+                });
+            // not recommended for production - you need to store your key material somewhere secure
+            builder.AddDeveloperSigningCredential();
+
+            services.AddAuthentication()
+                .AddGoogle("Google", options =>
+                {
+                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                    //AIzaSyBaSVJBor9Cj2w1ngPSD3ZT_V0ghOo0luA
+                    options.ClientId =
+                        "758817582785-262o88kkkbpjspnk5d22pgo31qpbn84j.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
+                    options.ClientSecret = "ztW7VFg8ZvsCM_NaOGLo_Mj8"; //Configuration["Secret:GoogleClientSecret"];
+                });
+
+            // preserve OIDC state in cache (solves problems with AAD and URL lenghts)
+            //services.AddOidcStateDataFormatterCache("aad");
+
+            // add CORS policy for non-IdentityServer endpoints
+            services.AddCors(options =>
+            {
+                options.AddPolicy("api", policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
+
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseCors("api");
+            app.UseRouting();
+            InitializeDatabase(app);
+            app.UseIdentityServer();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
+
+            });
+
+        }
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+
+                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                context.Database.Migrate();
+                if (!context.Clients.Any())
+                {
+                    foreach (var client in ServiceConfiguration.GetClients(Configuration["SiteUrl"]))
+                    {
+                        context.Clients.Add(client.ToEntity());
+                    }
+
+                    context.SaveChanges();
+                }
+
+                if (!context.IdentityResources.Any())
+                {
+                    foreach (var resource in ServiceConfiguration.IdentityResources)
+                    {
+                        context.IdentityResources.Add(resource.ToEntity());
+                    }
+
+                    context.SaveChanges();
+                }
+
+                //if (!context.ApiResources.Any())
+                //{
+                //    foreach (var resource in ServiceConfiguration.GetApiResources())
+                //    {
+                //        context.ApiResources.Add(resource.ToEntity());
+                //    }
+
+                //    context.SaveChanges();
+                //}
+
+                var applicationDbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                applicationDbContext.Database.Migrate();
+                //if (!applicationDbContext.Users.Any())
+                //{
+                //    applicationDbContext.Users.AddRange(ServiceConfiguration.GetUsers());
+
+                //    await applicationDbContext.SaveChangesAsync();
+                //}
+
+            }
+        }
+    }
+}
