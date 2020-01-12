@@ -206,6 +206,71 @@ namespace RahyabIdentity.Controllers.Account
             return View();
         }
 
+        // GET: /Account/Register
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(string returnUrl = null)
+        {
+            var schemes = await _schemeProvider.GetAllSchemesAsync();
+
+            var providers = schemes
+                .Where(x => x.DisplayName != null ||
+                            (x.Name.Equals(AccountOptions.WindowsAuthenticationSchemeName, StringComparison.OrdinalIgnoreCase))
+                )
+                .Select(x => new ExternalProvider
+                {
+                    DisplayName = x.DisplayName,
+                    AuthenticationScheme = x.Name
+                }).ToList();
+            var registerVm = new RegisterViewModel();
+            registerVm.ExternalProviders = providers;
+            registerVm.ReturnUrl = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
+
+            return View(registerVm);
+        }
+
+       // POST: /Account/Register
+       [HttpPost]
+       [AllowAnonymous]
+       [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid){
+                var user = new ApplicationUser
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Errors.Any()){
+                    foreach (var err in result.Errors){
+                        ModelState.AddModelError("", err.Description);
+                    }
+                    // If we got this far, something failed, redisplay form
+                    return View(model);
+                }
+                else if (result.Succeeded) {return RedirectToAction("login", "account", new { returnUrl = returnUrl }); }
+            }
+            else{ return View(model); }
+
+            if (returnUrl != null)
+            {
+                if (HttpContext.User.Identity.IsAuthenticated)
+                    return Redirect(returnUrl);
+                else
+                    if (ModelState.IsValid)
+                    return RedirectToAction("login", "account", new { returnUrl = returnUrl });
+                else
+                    return View(model);
+            }
+
+            return RedirectToAction("index", "home");
+        }
 
         /*****************************************/
         /* helper APIs for the AccountController */

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Yahoo" Version="3.0.0" />
     <PackageReference Include="IdentityServer4" Version="3.1.0" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="3.1.0" />
     <PackageReference Include="IdentityServer4.EntityFramework" Version="3.1.0" />
@@ -16,17 +17,22 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Configuration\Migrations\IdentityServer\ConfigurationDb\" />
-    <Folder Include="Views\Account\" />
     <Folder Include="Views\Consent\" />
     <Folder Include="Views\Device\" />
     <Folder Include="Views\Diagnostics\" />
     <Folder Include="Views\Grants\" />
+    <Folder Include="wwwroot\icons\" />
+    <Folder Include="wwwroot\images\icons\" />
   </ItemGroup>
 
   <ItemGroup>

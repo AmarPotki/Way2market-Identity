@@ -15,86 +15,67 @@ using Microsoft.Extensions.Hosting;
 using RahyabIdentity.Configuration;
 using RahyabIdentity.Infrastructure;
 using RahyabIdentity.Models;
-
-namespace RahyabIdentity
-{
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
+namespace RahyabIdentity{
+    public class Startup{
+        public Startup(IConfiguration configuration){
             Configuration = configuration;
         }
-
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
+        public void ConfigureServices(IServiceCollection services){
             services.AddControllersWithViews();
             // configures IIS out-of-proc settings (see https://github.com/aspnet/AspNetCore/issues/14882)
-            services.Configure<IISOptions>(iis =>
-            {
+            services.Configure<IISOptions>(iis => {
                 iis.AuthenticationDisplayName = "Windows";
                 iis.AutomaticAuthentication = false;
             });
 
             // configures IIS in-proc settings
-            services.Configure<IISServerOptions>(iis =>
-            {
+            services.Configure<IISServerOptions>(iis => {
                 iis.AuthenticationDisplayName = "Windows";
                 iis.AutomaticAuthentication = false;
             });
             var connectionString = Configuration["ConnectionString"];
-
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddEntityFrameworkSqlServer()
-                .AddDbContext<ApplicationDbContext>(options =>
-                    {
+                .AddDbContext<ApplicationDbContext>(options => {
                         options.UseSqlServer(connectionString,
-                            sqlServerOptionsAction: sqlOptions =>
-                            {
+                            sqlServerOptionsAction: sqlOptions => {
                                 sqlOptions.EnableRetryOnFailure(
                                     maxRetryCount: 10,
                                     maxRetryDelay: TimeSpan.FromSeconds(30),
                                     errorNumbersToAdd: null);
                             });
-
                     },
                     ServiceLifetime
                         .Scoped //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request));
                 );
-
-
-
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-            var builder = services.AddIdentityServer(options =>
-            {
-                options.Events.RaiseErrorEvents = true;
-                options.Events.RaiseInformationEvents = true;
-                options.Events.RaiseFailureEvents = true;
-                options.Events.RaiseSuccessEvents = true;
-
-                options.UserInteraction = new UserInteractionOptions
-                {
-                    LogoutUrl = "/Account/Logout",
-                    LoginUrl = "/Account/Login",
-                    LoginReturnUrlParameter = "returnUrl"
-                };
-            }).AddAspNetIdentity<ApplicationUser
+            var builder = services.AddIdentityServer(options => {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                    options.UserInteraction = new UserInteractionOptions
+                    {
+                        LogoutUrl = "/Account/Logout",
+                        LoginUrl = "/Account/Login",
+                        LoginReturnUrlParameter = "returnUrl"
+                    };
+                }).AddAspNetIdentity<ApplicationUser
                 >()
                 // .AddSigningCredential(new X509Certificate2(@".\Configuration\blueirvin.com.pfx", "Blu3Irvin.com"))
                 // this adds the config data from DB (clients, resources)
-                .AddConfigurationStore(options =>
-                {
+                .AddConfigurationStore(options => {
                     options.ConfigureDbContext = db =>
                         db.UseSqlServer(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
                 // this adds the operational data from DB (codes, tokens, consents)
-                .AddOperationalStore(options =>
-                {
+                .AddOperationalStore(options => {
                     options.ConfigureDbContext = db =>
                         db.UseSqlServer(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
@@ -102,90 +83,78 @@ namespace RahyabIdentity
                     // this enables automatic token cleanup. this is optional.
                     options.EnableTokenCleanup = true;
                     // options.TokenCleanupInterval = 15; // interval in seconds. 15 seconds useful for debugging
-
                 });
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
-
             services.AddAuthentication()
-                .AddGoogle("Google", options =>
-                {
-                    options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    //AIzaSyBaSVJBor9Cj2w1ngPSD3ZT_V0ghOo0luA
+                .AddCookie("RahyabIdentity")
+                .AddYahoo(options => {
+                    options.SignInScheme = "RahyabIdentity"; 
+                    options.Scope.Add("openid");
                     options.ClientId =
-                        "758817582785-262o88kkkbpjspnk5d22pgo31qpbn84j.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
-                    options.ClientSecret = "ztW7VFg8ZvsCM_NaOGLo_Mj8"; //Configuration["Secret:GoogleClientSecret"];
+                        "dj0yJmk9czJERU1mWU96VklwJmQ9WVdrOVFYTjNNbXRsTjJjbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWM4"; //Configuration.GetValue<string>("ExternalProviders:YahooClientId");
+                    options.ClientSecret =
+                        "93b8987a03bdd24de0fd52b7939e20a3bb8e7661"; //Configuration.GetValue<string>("ExternalProviders:YahooSecretKey");
+                    // options.CallbackPath = Configuration.GetValue<string>("ExternalProviders:YahooCallbackPath");
+                })
+                .AddGoogle("Google", options => {
+                    options.SignInScheme = "RahyabIdentity";
+                    // options.ClientId = "758817582785-ulf7898ms3eq9g1sok8r0m33opqc4vqh.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
+                    options.ClientId =
+                        "659563659230-7ro8eugsltgecicvob8216tgg7t3n9qa.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
+                    // options.ClientSecret = "ALBdL_em3UAEb-ScsNN0BkKd"; //Configuration["Secret:GoogleClientSecret"];
+                    options.ClientSecret = "zmJmKuK8pooDOU4ePR6zyR8b"; //Configuration["Secret:GoogleClientSecret"];
                 });
 
             // preserve OIDC state in cache (solves problems with AAD and URL lenghts)
             //services.AddOidcStateDataFormatterCache("aad");
 
             // add CORS policy for non-IdentityServer endpoints
-            services.AddCors(options =>
-            {
-                options.AddPolicy("api", policy =>
-                {
-                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-                });
+            services.AddCors(options => {
+                options.AddPolicy("api", policy => { policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); });
             });
+            services.AddTransient<IdentityErrorDescriber, FaIdentityErrorDescriber>();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-
-            }
-            else
-            {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env){
+            if (env.IsDevelopment()){ app.UseDeveloperExceptionPage(); }
+            else{
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("api");
             app.UseRouting();
             InitializeDatabase(app);
             app.UseIdentityServer();
-
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 //endpoints.MapControllerRoute(
                 //    name: "default",
                 //    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapDefaultControllerRoute();
-
             });
-
         }
-        private void InitializeDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
+        private void InitializeDatabase(IApplicationBuilder app){
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope()){
                 serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
-
                 var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
                 context.Database.Migrate();
-                if (!context.Clients.Any())
-                {
-                    foreach (var client in ServiceConfiguration.GetClients(Configuration["SiteUrl"]))
-                    {
+                if (!context.Clients.Any()){
+                    foreach (var client in ServiceConfiguration.GetClients(Configuration["SiteUrl"])){
                         context.Clients.Add(client.ToEntity());
                     }
 
                     context.SaveChanges();
                 }
 
-                if (!context.IdentityResources.Any())
-                {
-                    foreach (var resource in ServiceConfiguration.IdentityResources)
-                    {
+                if (!context.IdentityResources.Any()){
+                    foreach (var resource in ServiceConfiguration.IdentityResources){
                         context.IdentityResources.Add(resource.ToEntity());
                     }
 
@@ -201,7 +170,6 @@ namespace RahyabIdentity
 
                 //    context.SaveChanges();
                 //}
-
                 var applicationDbContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 applicationDbContext.Database.Migrate();
                 //if (!applicationDbContext.Users.Any())
@@ -210,7 +178,6 @@ namespace RahyabIdentity
 
                 //    await applicationDbContext.SaveChangesAsync();
                 //}
-
             }
         }
     }

@@ -80,7 +80,6 @@ C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\RahyabIden
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\RahyabIdentity.dll
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\RahyabIdentity.pdb
 C:\Repositories\RahyabIdentity\RahyabIdentity\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Design.dll
-C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\RahyabIdentity.MvcApplicationPartsAssemblyInfo.cache
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Account\AccessDenied.cshtml.g.cs
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Account\LoggedOut.cshtml.g.cs
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Account\Login.cshtml.g.cs
@@ -95,3 +94,6 @@ C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\View
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Shared\Redirect.cshtml.g.cs
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_ScopeListItem.cshtml.g.cs
 C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Shared\_ValidationSummary.cshtml.g.cs
+C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\Razor\Views\Account\Register.cshtml.g.cs
+C:\Repositories\RahyabIdentity\RahyabIdentity\bin\Debug\netcoreapp3.1\AspNet.Security.OAuth.Yahoo.dll
+C:\Repositories\RahyabIdentity\RahyabIdentity\obj\Debug\netcoreapp3.1\RahyabIdentity.MvcApplicationPartsAssemblyInfo.cache

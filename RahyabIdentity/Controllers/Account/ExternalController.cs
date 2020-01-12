@@ -88,7 +88,8 @@ namespace RahyabIdentity.Controllers.Account
         public async Task<IActionResult> Callback()
         {
             // read external identity from the temporary cookie
-            var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
+          //  var result = await HttpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
+            var result = await HttpContext.AuthenticateAsync("RahyabIdentity");
             if (result?.Succeeded != true)
             {
                 throw new Exception("External authentication error");
@@ -265,6 +266,7 @@ namespace RahyabIdentity.Controllers.Account
             var user = new ApplicationUser
             {
                 UserName = Guid.NewGuid().ToString(),
+                Email = email,
             };
             var identityResult = await _userManager.CreateAsync(user);
             if (!identityResult.Succeeded) throw new Exception(identityResult.Errors.First().Description);
