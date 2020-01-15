@@ -28,5 +28,8 @@ namespace RahyabIdentity.Configuration
         public override IdentityError DuplicateUserName(string userName){
             return new IdentityError { Code = nameof(DuplicateUserName), Description = "نام کاربری شما تکراری است" };
         }
+        public override IdentityError InvalidUserName(string userName){
+            return new IdentityError { Code = nameof(InvalidUserName), Description = "نام کاربری شما اشتباه است" };
+        }
     }
 }

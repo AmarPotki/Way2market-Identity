@@ -1,0 +1,262 @@
+﻿
+@font-face {
+  font-family: 'Vazir';
+  src: url('../fonts/Vazir-FD-WOL.eot');
+  src: url('../fonts/Vazir-FD-WOL.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/Vazir-FD-WOL.woff2') format('woff2'),
+      url('../fonts/Vazir-FD-WOL.woff') format('woff'),
+      url('../fonts/Vazir-FD-WOL.ttf') format('truetype'),
+      url('../fonts/Vazir-FD-WOL.svg#Vazir') format('svg');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Vazir FD-WOL';
+  src: url('../fonts/Vazir-FD-WOL.eot');
+  src: url('../fonts/Vazir-FD-WOL.eot?#iefix') format('embedded-opentype'),
+      url('../fonts/Vazir-FD-WOL.woff') format('woff'),
+      url('../fonts/Vazir-FD-WOL.ttf') format('truetype'),
+      url('../fonts/Vazir-FD-WOL.svg#Vazir-FD-WOL') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+	background: #fff;
+	font-family: 'Vazir','Vazir FD-WOL';
+	color: #000;
+	width: 100%;
+	height: 100%;
+}
+
+p {
+	color: #333;
+}
+
+.section {
+	border-top: 1px solid #f0f0f0;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+
+
+
+
+/******* Effects *******/
+
+.particles_effect .container {
+	background: url('../images/photo_3.jpg') no-repeat 0 0;
+	background-size: cover;
+	background-attachment: fixed;
+}
+
+.particles_effect .container_block,
+.winter_effect .container_block {
+	z-index: auto;
+}
+
+.particles_effect .container_title,
+.particles_effect .container_subtitle,
+.particles_effect .container_description,
+.winter_effect .container_title,
+.winter_effect .container_subtitle,
+.winter_effect .container_description {
+	z-index: 4;
+}
+
+.particles_effect .container_button,
+.particles_effect .form_send_message,
+.winter_effect .container_button,
+.winter_effect .form_send_message {
+	z-index: 5;
+}
+
+#particles_block,
+#winter_block {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 4;
+}
+
+
+
+/******* Container section *******/
+
+.container_block {
+	z-index: 3;
+}
+
+.container:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,.25);
+	z-index: 1;
+}
+
+.container_clear.container:after {
+	display: none;
+}
+
+.container_title {
+	margin-bottom: -20px;
+}
+
+.container_title,
+.container_subtitle {
+	position: relative;
+	color: #fff;
+	font-family: 'Vazir','Vazir FD-WOL';
+	font-size: 60px;
+	line-height: 67px;
+	font-weight: 600;
+	text-shadow: 1px 1px 30px rgba(0,0,0,0.3);
+}
+
+.container_description {
+	position: relative;
+	max-width: 700px;
+	margin: 0 auto;
+	font-size: 16px;
+	line-height: 33px;
+	font-family: 'Vazir FD-WOL';
+	color: #fff;
+	text-shadow: 1px 1px 30px rgba(0,0,0,0.3);
+	padding-top: 31px;
+	direction: rtl;
+	font-weight: normal;
+}
+
+.container_button {
+	margin-top: 30px;
+	text-align: center;
+	font-size: 0;
+}
+
+.container_button_message,
+.container_button_subscribe {
+	display: inline-block;
+	margin-right: 20px;
+	min-height: 40px;
+	padding: 7px 11px;
+	line-height: 40px;
+	border: 1px solid #fff;
+	background: none;
+	color: #fff;
+	font-size: 17px;
+	transition: background 0.3s, border 0.3s;
+}
+
+.container_button_message {
+	background: #fff;
+	color: #444;
+}
+
+	.container_button_message:last-child,
+	.container_button_subscribe:last-child {
+		margin-right: 0;
+	}
+
+	.container_button_message:hover {
+		background: #dd543d;
+		border-color: #dd543d;
+		color: #fff;
+	}
+
+.container_button_subscribe:hover {
+	background: #fff;
+	color: #444;
+}
+
+.green_button {
+	background: #4ace6f;
+	color: #fff;
+	border: 1px solid #4ace6f;
+}
+
+	.green_button:hover {
+		background: #3fb05e;
+		color: #fff;
+		border: 1px solid #3fb05e;
+	}
+
+.container_arrow {
+	position: absolute;
+	top: auto;
+	left: 0;
+	right: 0;
+	bottom: 50px;
+	width: 35px;
+	height: 35px;
+	margin: auto;
+	line-height: 35px;
+	text-align: center;
+	color: #fff;
+	font-size: 21px;
+	border: 2px solid #fff;
+	border-radius: 100%;
+	transition: opacity 0.3s;
+	z-index: 5;
+	cursor: pointer;
+}
+
+	.container_arrow:hover {
+		opacity: 0.85;
+	}
+
+.container_form .container_title,
+.container_form .container_subtitle {
+	font-size: 60px;
+	line-height: 67px;
+	text-align: left;
+}
+
+.container_form .uk-form {
+	position: relative;
+	padding: 40px 40px 15px;
+	margin: 0 50px;
+	background: rgba(0,0,0,.55);
+	min-height: 150px;
+}
+
+.container_form input,
+.container_form textarea {
+	color: #333;
+	margin-bottom: 5px;
+	background: rgba(255,255,255,.9) !important;
+}
+
+	.container_form input:focus,
+	.container_form input:active,
+	.container_form textarea:focus,
+	.container_form textarea:active {
+		background: rgba(255,255,255,1) !important;
+	}
+
+.container_form .container_description {
+	position: relative;
+	padding: 20px 70px 0 0;
+	text-align: left;
+	color: #fff;
+	text-shadow: 1px 1px 30px rgba(0,0,0,0.3);
+}
+
+	.container_form .container_description:before {
+		content: '';
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 85%;
+		height: 1px;
+		background: #fff;
+	}
+
+	.container_form .container_description:before {
+		width: 95%;
+	}

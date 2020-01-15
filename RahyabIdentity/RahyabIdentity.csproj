@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Configuration\Migrations\IdentityServer\ConfigurationDb\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Consent\" />
     <Folder Include="Views\Device\" />
     <Folder Include="Views\Diagnostics\" />
