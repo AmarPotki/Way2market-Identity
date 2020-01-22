@@ -129,7 +129,11 @@ namespace RahyabIdentity.Controllers.Account
             await HttpContext.SignInAsync(user.Id, name, provider, localSignInProps, additionalLocalClaims.ToArray());
 
             // delete temporary cookie used during external authentication
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+           await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+           await HttpContext.SignOutAsync(IdentityServer4.IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+            //changed by Amar
+            await HttpContext.SignOutAsync("RahyabIdentity");
 
             // retrieve return URL
             var returnUrl = result.Properties.Items["returnUrl"] ?? "~/";

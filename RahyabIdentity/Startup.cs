@@ -89,7 +89,8 @@ namespace RahyabIdentity{
             services.AddAuthentication()
                 .AddCookie("RahyabIdentity")
                 .AddYahoo(options => {
-                    options.SignInScheme = "RahyabIdentity"; 
+                   options.SignInScheme = "RahyabIdentity"; 
+                  //  options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     options.Scope.Add("openid");
                     options.ClientId =
                         "dj0yJmk9czJERU1mWU96VklwJmQ9WVdrOVFYTjNNbXRsTjJjbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWM4"; //Configuration.GetValue<string>("ExternalProviders:YahooClientId");
@@ -99,6 +100,7 @@ namespace RahyabIdentity{
                 })
                 .AddGoogle("Google", options => {
                     options.SignInScheme = "RahyabIdentity";
+                   // options.SignInScheme =  IdentityServerConstants.ExternalCookieAuthenticationScheme;
                     // options.ClientId = "758817582785-ulf7898ms3eq9g1sok8r0m33opqc4vqh.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
                     options.ClientId =
                         "659563659230-7ro8eugsltgecicvob8216tgg7t3n9qa.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];

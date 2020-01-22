@@ -108,7 +108,9 @@
                                 حساب کاربری ندارید؟
                             </span>
 
-                            <a href="#" class="txt2 bo1">
+                            <a asp-controller="Account"
+                                            asp-action="Register"
+                                            asp-route-returnUrl="@Model.ReturnUrl" class="txt2 bo1">
                                 ثبت نام کنید
                             </a>
                         </div>
