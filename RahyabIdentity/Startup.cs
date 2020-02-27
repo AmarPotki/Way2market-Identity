@@ -106,7 +106,15 @@ namespace RahyabIdentity{
                         "659563659230-7ro8eugsltgecicvob8216tgg7t3n9qa.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
                     // options.ClientSecret = "ALBdL_em3UAEb-ScsNN0BkKd"; //Configuration["Secret:GoogleClientSecret"];
                     options.ClientSecret = "zmJmKuK8pooDOU4ePR6zyR8b"; //Configuration["Secret:GoogleClientSecret"];
-                });
+                }).AddInstagram("Instagram", options => {
+                    options.SignInScheme = "RahyabIdentity";
+                    options.ClientId = "2605274459716910";
+                    options.ClientSecret = "52733ddece62aa24c84504e36fd61ffb";
+
+                    options.Scope.Remove("basic");
+                    options.Scope.Add("user_profile");
+                    options.Scope.Add("user_media");
+                }); 
 
             // preserve OIDC state in cache (solves problems with AAD and URL lenghts)
             //services.AddOidcStateDataFormatterCache("aad");

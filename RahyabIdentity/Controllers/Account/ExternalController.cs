@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4.Events;
@@ -14,6 +19,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RahyabIdentity.Models;
 namespace RahyabIdentity.Controllers.Account
 {
@@ -27,6 +34,7 @@ namespace RahyabIdentity.Controllers.Account
         private readonly IClientStore _clientStore;
         private readonly IEventService _events;
         private readonly ILogger<ExternalController> _logger;
+        private static readonly byte[] PublicKey = { 41, 72, 124, 55, 33, 166, 57, 176, 33, 8, 99, 9, 226, 12, 68, 39 };
 
         public ExternalController(
             UserManager<ApplicationUser> userManager,
@@ -80,7 +88,25 @@ namespace RahyabIdentity.Controllers.Account
                 return Challenge(props, provider);
             }
         }
+        public async Task<IActionResult> CallInstagram(string redirectUrl){
+            var nonce = EncryptForPublicKey(redirectUrl);
+            //todo: get client_id form appsetting 
+            var url = $@"https://api.instagram.com/oauth/authorize?client_id=2605274459716910&redirect_uri=https://localhost:44345/External/CallBackInstagram/&scope=user_profile,user_media&response_type=code&state={nonce}";
+            return Redirect(url);
+        }
+        [HttpGet]
 
+        public async Task<IActionResult> CallBackInstagram(string code,string state)
+        {var redirectUrl = DecryptCryptoInfoForPublicKey(state);
+            if (string.IsNullOrWhiteSpace(redirectUrl)) 
+               return RedirectToAction("Error", "Home");
+
+
+
+            
+            var url = $"{redirectUrl}/?code={code}";
+            return Redirect(url);
+        }
         /// <summary>
         /// Post processing of external authentication
         /// </summary>
@@ -312,6 +338,67 @@ namespace RahyabIdentity.Controllers.Account
 
         private void ProcessLoginCallbackForSaml2p(AuthenticateResult externalResult, List<Claim> localClaims, AuthenticationProperties localSignInProps)
         {
+        }
+
+        public string DecryptCryptoInfoForPublicKey(string data)
+        {
+            var key = PublicKey;
+            try
+            {
+                // byte data
+                var internalData = Convert.FromBase64String(data.Replace("_", "/").Replace("-", "+"));
+
+                // Create a new Rijndael object to generate a key
+                // and initialization vector (IV).
+                var rijndaelAlgo = new RijndaelManaged { Key = key, Padding = PaddingMode.PKCS7 };
+                rijndaelAlgo.IV = new byte[rijndaelAlgo.IV.Length];
+
+                // Create a CryptoStream using the MemoryStream
+                using (var ms = new MemoryStream())
+                {
+                    using (var cs = new CryptoStream(ms, rijndaelAlgo.CreateDecryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(internalData, 0, internalData.Length);
+                        cs.FlushFinalBlock();
+                        var decryptString = Encoding.ASCII.GetString(ms.ToArray());
+                        var decryptedValue = decryptString.Split(',');
+                        // exception if it can't parse it 
+                        var tick = long.Parse(decryptedValue[1]);
+                        return decryptedValue[0];
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return  "";
+            }
+        }
+        public string EncryptForPublicKey(string url)
+        {
+            var key = PublicKey;
+            try
+            {
+                var data = url + "," + DateTime.Now.Ticks;
+                // byte data
+                var internalData = Encoding.ASCII.GetBytes(data);
+
+                // Create a new Rijndael object to generate a key
+                // and initialization vector (IV).
+                var rijndaelAlgo = new RijndaelManaged { Key = key, Padding = PaddingMode.PKCS7 };
+                rijndaelAlgo.IV = new byte[rijndaelAlgo.IV.Length];
+
+                // Create a CryptoStream using the MemoryStream
+                using (var ms = new MemoryStream())
+                {
+                    using (var cs = new CryptoStream(ms, rijndaelAlgo.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        cs.Write(internalData, 0, internalData.Length);
+                        cs.FlushFinalBlock();
+                        return (Convert.ToBase64String(ms.ToArray())).Replace("/", "_").Replace("+", "-");
+                    }
+                }
+            }
+            catch (Exception e){ return ""; }
         }
     }
 }

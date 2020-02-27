@@ -60,6 +60,17 @@
                                     Google
                                 </a>
                             }
+                            else
+                            {
+                    <a class="btn-google m-b-20" asp-controller="External"
+                       asp-action="Challenge"
+                       asp-route-provider="@provider.AuthenticationScheme"
+                       asp-route-returnUrl="@Model.ReturnUrl">
+                        <i class="fa fa-yahoo"></i>
+                        Instagram
+                    </a>
+                            }
+
                         }
 
                         <div class="p-t-31 p-b-9">
@@ -89,14 +100,14 @@
                         @*<input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">*@
 
                         @*@if (Model.AllowRememberLogin)
-            {
-                <div class="form-group login-remember">
-                    <label asp-for="RememberLogin">
-                        <input asp-for="RememberLogin">
-                        <strong>Remember My Login</strong>
-                    </label>
-                </div>
-            }*@
+        {
+            <div class="form-group login-remember">
+                <label asp-for="RememberLogin">
+                    <input asp-for="RememberLogin">
+                    <strong>Remember My Login</strong>
+                </label>
+            </div>
+        }*@
                         <div class="container-login100-form-btn m-t-17">
                             <button class="login100-form-btn" name="button" value="login">
                                 ورود به حساب کاربری
@@ -109,8 +120,8 @@
                             </span>
 
                             <a asp-controller="Account"
-                                            asp-action="Register"
-                                            asp-route-returnUrl="@Model.ReturnUrl" class="txt2 bo1">
+                               asp-action="Register"
+                               asp-route-returnUrl="@Model.ReturnUrl" class="txt2 bo1">
                                 ثبت نام کنید
                             </a>
                         </div>
