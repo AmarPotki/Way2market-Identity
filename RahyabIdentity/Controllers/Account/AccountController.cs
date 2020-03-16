@@ -1,4 +1,4 @@
-// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using RahyabIdentity.Models;
+using RahyabIdentity.Services;
 namespace RahyabIdentity.Controllers.Account
 {
     [SecurityHeaders]
@@ -28,14 +29,14 @@ namespace RahyabIdentity.Controllers.Account
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
-
+        private readonly ISmsService _smsService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
-            IEventService events)
+            IEventService events, ISmsService smsService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -43,6 +44,7 @@ namespace RahyabIdentity.Controllers.Account
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _smsService = smsService;
         }
 
         /// <summary>
@@ -106,6 +108,15 @@ namespace RahyabIdentity.Controllers.Account
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(model.Username);
+                    //todo: bayad user betavanad az jayee dobare darkhast taeed sms bedahad
+                    if (!user.PhoneNumberConfirmed){
+                        ModelState.AddModelError("", "کاربری شما هنوز تایید نشده، اگر اس ام اس دریافت نکرده اید دوباره تلاش کنید");
+
+                        var vv = await BuildLoginViewModelAsync(model);
+                        return View(vv);
+                 
+
+                    }
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.ClientId));
 
                     if (context != null)
@@ -137,7 +148,7 @@ namespace RahyabIdentity.Controllers.Account
                     }
                 }
 
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.ClientId));
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.ClientId));
                 ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
             }
 
@@ -146,7 +157,7 @@ namespace RahyabIdentity.Controllers.Account
             return View(vm);
         }
 
-        
+
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -230,33 +241,46 @@ namespace RahyabIdentity.Controllers.Account
             return View(registerVm);
         }
 
-       // POST: /Account/Register
-       [HttpPost]
-       [AllowAnonymous]
-       [ValidateAntiForgeryToken]
+        // POST: /Account/Register
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid){
+            if (ModelState.IsValid)
+            {
                 var user = new ApplicationUser
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    UserName = model.Email,
+                    UserName = model.PhoneNumber,
                     Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Errors.Any()){
-                    foreach (var err in result.Errors){
+                if (result.Errors.Any())
+                {
+                    foreach (var err in result.Errors)
+                    {
                         ModelState.AddModelError("", err.Description);
                     }
+
                     // If we got this far, something failed, redisplay form
                     return View(model);
                 }
-                else if (result.Succeeded) {return RedirectToAction("login", "account", new { returnUrl = returnUrl }); }
+                else if (result.Succeeded)
+                {
+                    var smsCode = await _userManager.GenerateChangePhoneNumberTokenAsync(user, model.PhoneNumber);
+                    var r = await _smsService.SendSms(model.PhoneNumber, smsCode);
+                    if (r == "ok")
+                        return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id });
+
+                    ModelState.AddModelError("", r);
+                    return View(model);
+                }
             }
-            else{ return View(model); }
+            else { return View(model); }
 
             if (returnUrl != null)
             {
@@ -272,6 +296,33 @@ namespace RahyabIdentity.Controllers.Account
             return RedirectToAction("index", "home");
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmPhoneNumber(string userId, string returnUrl)
+        {
+            var model = new ConfirmViewModel
+            {
+                UserId = userId,
+                ReturnUrl = returnUrl
+            };
+            return View(model);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmPhoneNumber(ConfirmViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                var flag = await _userManager.VerifyChangePhoneNumberTokenAsync(user, model.Code, user.PhoneNumber);
+                if (flag)
+                    return RedirectToAction("ConfirmPhoneNumber", "account", new { returnUrl = model.ReturnUrl });
+                ModelState.AddModelError("", "کد اشتباه می باشد");
+                return View(model);
+            }
+            return View(model);
+        }
         /*****************************************/
         /* helper APIs for the AccountController */
         /*****************************************/

@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using RahyabIdentity.Configuration;
 using RahyabIdentity.Infrastructure;
 using RahyabIdentity.Models;
+using RahyabIdentity.Services;
 namespace RahyabIdentity{
     public class Startup{
         public Startup(IConfiguration configuration){
@@ -124,6 +125,7 @@ namespace RahyabIdentity{
                 options.AddPolicy("api", policy => { policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); });
             });
             services.AddTransient<IdentityErrorDescriber, FaIdentityErrorDescriber>();
+            services.AddTransient<ISmsService, SmsService>();
 
         }
 

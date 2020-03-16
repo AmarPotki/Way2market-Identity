@@ -1,0 +1,33 @@
+﻿@model RahyabIdentity.Controllers.Account.ConfirmViewModel
+
+@{
+    ViewData["Title"] = "ConfirmPhoneNumber";
+}
+
+<h1>ConfirmPhoneNumber</h1>
+
+<h4>ConfirmViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ConfirmPhoneNumber">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="ReturnUrl" class="form-control" type="hidden" />
+            <input asp-for="UserId" class="form-control" type="hidden" />
+
+            <div class="form-group">
+                <label asp-for="Code" class="control-label"></label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="OK" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
