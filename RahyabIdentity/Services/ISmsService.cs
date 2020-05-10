@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 namespace RahyabIdentity.Services{
-    public interface ISmsService{
-        Task<string> SendSms(string phoneNumber, string code);
+    public interface ISmsService
+    {
+        string SendVerifySms(string mobile, string token);
+        string SendSms(string mobile, string text);
     }
 }

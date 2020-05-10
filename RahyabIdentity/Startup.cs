@@ -5,6 +5,8 @@ using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -126,6 +128,8 @@ namespace RahyabIdentity{
             });
             services.AddTransient<IdentityErrorDescriber, FaIdentityErrorDescriber>();
             services.AddTransient<ISmsService, SmsService>();
+            services.AddTransient<IRedirectUriValidator, Way2MarketRedirectValidator>();
+            services.AddTransient<IProfileService, ProfileService>();
 
         }
 

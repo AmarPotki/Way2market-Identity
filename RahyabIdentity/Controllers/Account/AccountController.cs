@@ -13,7 +13,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using RahyabIdentity.Models;
 using RahyabIdentity.Services;
@@ -104,19 +106,29 @@ namespace RahyabIdentity.Controllers.Account
 
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var user = await _userManager.FindByNameAsync(model.Username);
+          
+              //  _signInManager.CheckPasswordSignInAsync()
+               // var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByNameAsync(model.Username);
                     //todo: bayad user betavanad az jayee dobare darkhast taeed sms bedahad
-                    if (!user.PhoneNumberConfirmed){
+                    if (!user.PhoneNumberConfirmed)
+                    {
                         ModelState.AddModelError("", "کاربری شما هنوز تایید نشده، اگر اس ام اس دریافت نکرده اید دوباره تلاش کنید");
 
-                        var vv = await BuildLoginViewModelAsync(model);
+                        var vv = await BuildLoginViewModelAsync(model); //new LoginViewModel { Username = model.Username, ReturnUrl = model.ReturnUrl, RememberLogin = model.RememberLogin };
                         return View(vv);
-                 
-
                     }
+
+                    await _signInManager.SignInWithClaimsAsync(user,model.RememberLogin, new List<Claim>
+                    {
+                        new Claim("FirstName", user.FirstName),
+                        new Claim("LastName", user.LastName),
+                        new Claim("UserName", user.UserName),
+
+                    });
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName, clientId: context?.ClientId));
 
                     if (context != null)
@@ -272,8 +284,8 @@ namespace RahyabIdentity.Controllers.Account
                 else if (result.Succeeded)
                 {
                     var smsCode = await _userManager.GenerateChangePhoneNumberTokenAsync(user, model.PhoneNumber);
-                    var r = await _smsService.SendSms(model.PhoneNumber, smsCode);
-                    if (r == "ok")
+                    var r =  _smsService.SendVerifySms(model.PhoneNumber, smsCode);
+                    if (string.IsNullOrEmpty(r))
                         return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id });
 
                     ModelState.AddModelError("", r);
