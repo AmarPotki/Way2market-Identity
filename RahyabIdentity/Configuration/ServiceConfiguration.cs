@@ -73,9 +73,9 @@ namespace RahyabIdentity.Configuration
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     RequireClientSecret = false,
-                    RedirectUris = { "http://localhost:49278/" ,"http://localhost:49278/signin-oidc"},
-                    PostLogoutRedirectUris = { "http://localhost:49278/","http://localhost:49278/signin-oidc" },
-                    // FrontChannelLogoutUri = "http://localhost:49278/", // for testing identityserver on localhost
+                    RedirectUris = { "https://localhost:44389/", "https://localhost:44389/signin-oidc"},
+                    PostLogoutRedirectUris = { "https://localhost:44389/","https://localhost:44389/signin-oidc" },
+                    // FrontChannelLogoutUri = "https://localhost:44389/", // for testing identityserver on localhost
                    
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = { "openid", "profile", "email", "api" },
