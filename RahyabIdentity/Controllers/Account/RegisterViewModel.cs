@@ -16,12 +16,12 @@ namespace RahyabIdentity.Controllers.Account
         [StringLength(100, ErrorMessage = "نام خانوادگی حداقل باید 3 کارکتر باشد", MinimumLength = 3)]
         public string LastName { get; set; }
 
-        [Required]
-        [EmailAddress(ErrorMessage = "پست الکترونیکی معتبر نمی باشد")]
-        [Display(Name = "پست الکترونیکی")]
-        //[RegularExpression(@"^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$",
-        //    ErrorMessage = "پست الکترونیکی معتبر نمی باشد")]
-        public string Email { get; set; }
+        //[Required]
+        //[EmailAddress(ErrorMessage = "پست الکترونیکی معتبر نمی باشد")]
+        //[Display(Name = "پست الکترونیکی")]
+        ////[RegularExpression(@"^([0-9a-zA-Z]+[-._+&])*[0-9a-zA-Z]+@([-0-9a-zA-Z]+[.])+[a-zA-Z]{2,6}$",
+        ////    ErrorMessage = "پست الکترونیکی معتبر نمی باشد")]
+        //public string Email { get; set; }
 
         [Required]
         [Display(Name = "شماره همراه")]

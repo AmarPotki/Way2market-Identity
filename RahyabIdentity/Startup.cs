@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using AspNetCoreRateLimit;
 using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.EntityFramework.DbContexts;
@@ -89,35 +90,36 @@ namespace RahyabIdentity{
                 });
             // not recommended for production - you need to store your key material somewhere secure
             builder.AddDeveloperSigningCredential();
-            services.AddAuthentication()
-                .AddCookie("RahyabIdentity")
-                .AddYahoo(options => {
-                   options.SignInScheme = "RahyabIdentity"; 
-                  //  options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    options.Scope.Add("openid");
-                    options.ClientId =
-                        "dj0yJmk9czJERU1mWU96VklwJmQ9WVdrOVFYTjNNbXRsTjJjbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWM4"; //Configuration.GetValue<string>("ExternalProviders:YahooClientId");
-                    options.ClientSecret =
-                        "93b8987a03bdd24de0fd52b7939e20a3bb8e7661"; //Configuration.GetValue<string>("ExternalProviders:YahooSecretKey");
-                    // options.CallbackPath = Configuration.GetValue<string>("ExternalProviders:YahooCallbackPath");
-                })
-                .AddGoogle("Google", options => {
-                    options.SignInScheme = "RahyabIdentity";
-                   // options.SignInScheme =  IdentityServerConstants.ExternalCookieAuthenticationScheme;
-                    // options.ClientId = "758817582785-ulf7898ms3eq9g1sok8r0m33opqc4vqh.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
-                    options.ClientId =
-                        "659563659230-7ro8eugsltgecicvob8216tgg7t3n9qa.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
-                    // options.ClientSecret = "ALBdL_em3UAEb-ScsNN0BkKd"; //Configuration["Secret:GoogleClientSecret"];
-                    options.ClientSecret = "zmJmKuK8pooDOU4ePR6zyR8b"; //Configuration["Secret:GoogleClientSecret"];
-                }).AddInstagram("Instagram", options => {
-                    options.SignInScheme = "RahyabIdentity";
-                    options.ClientId = "2605274459716910";
-                    options.ClientSecret = "52733ddece62aa24c84504e36fd61ffb";
 
-                    options.Scope.Remove("basic");
-                    options.Scope.Add("user_profile");
-                    options.Scope.Add("user_media");
-                }); 
+            //services.AddAuthentication()
+            //    .AddCookie("RahyabIdentity")
+            //    .AddYahoo(options => {
+            //       options.SignInScheme = "RahyabIdentity"; 
+            //      //  options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+            //        options.Scope.Add("openid");
+            //        options.ClientId =
+            //            "dj0yJmk9czJERU1mWU96VklwJmQ9WVdrOVFYTjNNbXRsTjJjbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmc3Y9MCZ4PWM4"; //Configuration.GetValue<string>("ExternalProviders:YahooClientId");
+            //        options.ClientSecret =
+            //            "93b8987a03bdd24de0fd52b7939e20a3bb8e7661"; //Configuration.GetValue<string>("ExternalProviders:YahooSecretKey");
+            //        // options.CallbackPath = Configuration.GetValue<string>("ExternalProviders:YahooCallbackPath");
+            //    })
+            //    .AddGoogle("Google", options => {
+            //        options.SignInScheme = "RahyabIdentity";
+            //       // options.SignInScheme =  IdentityServerConstants.ExternalCookieAuthenticationScheme;
+            //        // options.ClientId = "758817582785-ulf7898ms3eq9g1sok8r0m33opqc4vqh.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
+            //        options.ClientId =
+            //            "659563659230-7ro8eugsltgecicvob8216tgg7t3n9qa.apps.googleusercontent.com"; //Configuration["Secret:GoogleClientId"];
+            //        // options.ClientSecret = "ALBdL_em3UAEb-ScsNN0BkKd"; //Configuration["Secret:GoogleClientSecret"];
+            //        options.ClientSecret = "zmJmKuK8pooDOU4ePR6zyR8b"; //Configuration["Secret:GoogleClientSecret"];
+            //    }).AddInstagram("Instagram", options => {
+            //        options.SignInScheme = "RahyabIdentity";
+            //        options.ClientId = "2605274459716910";
+            //        options.ClientSecret = "52733ddece62aa24c84504e36fd61ffb";
+
+            //        options.Scope.Remove("basic");
+            //        options.Scope.Add("user_profile");
+            //        options.Scope.Add("user_media");
+            //    }); 
 
             // preserve OIDC state in cache (solves problems with AAD and URL lenghts)
             //services.AddOidcStateDataFormatterCache("aad");
@@ -131,17 +133,32 @@ namespace RahyabIdentity{
             services.AddTransient<IRedirectUriValidator, Way2MarketRedirectValidator>();
             services.AddTransient<IProfileService, ProfileService>();
 
+
+            //asp.netcoreRateLimite
+            services.AddOptions();
+            services.AddMemoryCache();
+            //load ip rules from appsettings.json
+           // services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            //load ip rules from appsettings.json
+            //services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
+        
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env){
+            app.UseIpRateLimiting();
+
             if (env.IsDevelopment()){ app.UseDeveloperExceptionPage(); }
             else{
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("api");

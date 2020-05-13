@@ -4,6 +4,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System;
+using AspNetCoreRateLimit;
+using Microsoft.Extensions.DependencyInjection;
 namespace RahyabIdentity
 {
     public class Program
@@ -24,6 +26,7 @@ namespace RahyabIdentity
                             flushToDiskInterval: TimeSpan.FromSeconds(1)).CreateLogger();
             try
             {
+
                 var host = CreateHostBuilder(args).Build();
 
                 Log.Information("Starting host...");

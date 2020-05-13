@@ -31,7 +31,16 @@
             <div class="container-login100">
                 <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
                     <partial name="_ValidationSummary" />
-
+                    @if (Model.EnablerResend){
+                        <div>
+                            <a asp-controller="Account"
+                               asp-action="ConfirmPhoneNumber"
+                               asp-route-returnUrl="@Model.ReturnUrl" asp-route-isDefault="false" asp-route-userId="@Model.UserId" class="txt2 bo1">
+                                تایید شماره تلفن همراه
+                            </a>
+                        </div>
+                    }
+              
                     <form class="login100-form validate-form flex-sb flex-w" asp-route="Login">
                         <input type="hidden" asp-for="ReturnUrl" />
                         <span class="login100-form-title p-b-53">

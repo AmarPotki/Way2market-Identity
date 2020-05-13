@@ -118,7 +118,9 @@ namespace RahyabIdentity.Controllers.Account
                     {
                         ModelState.AddModelError("", "کاربری شما هنوز تایید نشده، اگر اس ام اس دریافت نکرده اید دوباره تلاش کنید");
 
-                        var vv = await BuildLoginViewModelAsync(model); //new LoginViewModel { Username = model.Username, ReturnUrl = model.ReturnUrl, RememberLogin = model.RememberLogin };
+                        var vv = await BuildLoginViewModelAsync(model);
+                        vv.UserId = user.Id;
+                        vv.EnablerResend = true;
                         return View(vv);
                     }
 
@@ -267,7 +269,7 @@ namespace RahyabIdentity.Controllers.Account
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     UserName = model.PhoneNumber,
-                    Email = model.Email,
+                    //Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -286,7 +288,7 @@ namespace RahyabIdentity.Controllers.Account
                     var smsCode = await _userManager.GenerateChangePhoneNumberTokenAsync(user, model.PhoneNumber);
                     var r =  _smsService.SendVerifySms(model.PhoneNumber, smsCode);
                     if (string.IsNullOrEmpty(r))
-                        return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id });
+                        return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id,ReturnUrl=returnUrl });
 
                     ModelState.AddModelError("", r);
                     return View(model);
@@ -310,14 +312,35 @@ namespace RahyabIdentity.Controllers.Account
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmPhoneNumber(string userId, string returnUrl)
+        public async Task<IActionResult> ConfirmPhoneNumber(string userId, string returnUrl,bool isDefault=true)
         {
             var model = new ConfirmViewModel
             {
                 UserId = userId,
                 ReturnUrl = returnUrl
             };
-            return View(model);
+            //default means the normal way the user registers
+
+                var user =await _userManager.FindByIdAsync(userId);
+                if (user == null){
+                    ModelState.AddModelError("0", "کار بر پیدا نشد");
+                    return View(model);
+                }
+
+                if (user.PhoneNumberConfirmed){
+                    ModelState.AddModelError("1", "شماره تلفن شما قبل تایید شده");
+                    return View(model);
+                }
+
+                if (isDefault){
+                    var code = await _userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                    _smsService.SendVerifySms(user.PhoneNumber, code);
+                    return View(model);
+                }
+
+
+
+                return View(model);
         }
         [HttpPost]
         [AllowAnonymous]
@@ -327,12 +350,40 @@ namespace RahyabIdentity.Controllers.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(model.UserId);
-                var flag = await _userManager.VerifyChangePhoneNumberTokenAsync(user, model.Code, user.PhoneNumber);
-                if (flag)
-                    return RedirectToAction("ConfirmPhoneNumber", "account", new { returnUrl = model.ReturnUrl });
+                var result = await _userManager.VerifyChangePhoneNumberTokenAsync(user, user.PhoneNumber, model.Code);
+                if (result){
+                    user.PhoneNumberConfirmed = true;
+                    await _userManager.UpdateAsync(user);
+
+                    await _signInManager.SignInWithClaimsAsync(user,true, new List<Claim>
+                    {
+                        new Claim("FirstName", user.FirstName),
+                        new Claim("LastName", user.LastName),
+                        new Claim("UserName", user.UserName),
+
+                    });
+                    if(string.IsNullOrEmpty(model.ReturnUrl))
+                        return Redirect("~/");
+                    return Redirect(model.ReturnUrl);
+                }
+
                 ModelState.AddModelError("", "کد اشتباه می باشد");
                 return View(model);
             }
+            return View(model);
+        }
+
+     
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangePassword( string returnUrl)
+        {
+            var model = new ChangePasswordRequestViewModel
+            {
+
+                ReturnUrl = returnUrl
+            };
             return View(model);
         }
         /*****************************************/
