@@ -2,46 +2,50 @@
 
 @{
     ViewData["Title"] = "ConfirmPhoneNumber";
-    Layout = "_Layout";
+    Layout = null; //"_Layout";
 }
 
 <h1>تایید شماره موبایل</h1>
 لطفا صفحه را رفرش نکنید
 <hr />
 <div class="row">
-        @{
-            if (ViewData.ModelState.Keys.Contains("0") || ViewData.ModelState.Keys.Contains("1"))
-            {
-                <div class="alert alert-danger">
-                    <div>@ViewData.ModelState.FirstOrDefault().Value.Errors[0].ErrorMessage</div>
-                </div>
-            }
-            else{
-                <form asp-action="ConfirmPhoneNumber">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input asp-for="ReturnUrl" class="form-control" type="hidden" />
-                    <input asp-for="UserId" class="form-control" type="hidden" />
-
-                    <div class="form-group">
-                        <label asp-for="Code" class="control-label"></label>
-                        <input asp-for="Code" class="form-control" />
-                        <span asp-validation-for="Code" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="OK" class="btn btn-primary" />
-                    </div>
-                    <div class="form-group">
-                    </div>
-                </form>
-                <input type="button" value="Resend" class="btn btn-primary" id="btn-resend" onclick="resend(@Model.UserId)"/>
-
-            }
+    @{
+        if (ViewData.ModelState.Keys.Contains("0") || ViewData.ModelState.Keys.Contains("1"))
+        {
+            <div class="alert alert-danger">
+                <div>@ViewData.ModelState.FirstOrDefault().Value.Errors[0].ErrorMessage</div>
+            </div>
         }
+        else{
+            <form asp-action="ConfirmPhoneNumber">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="ReturnUrl" class="form-control" type="hidden" />
+                <input asp-for="UserId" class="form-control" type="hidden" />
+
+                <div class="form-group">
+                    <label asp-for="Code" class="control-label"></label>
+                    <input asp-for="Code" class="form-control" />
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="OK" class="btn btn-primary" />
+                </div>
+                <div class="form-group">
+                </div>
+            </form>
+            <input type="button" value="Resend" class="btn btn-primary" id="btn-resend" />
+
+        }
+    }
        
    
-    </div>
-<script src="~/js/confirm-phone-number.js"></script>
-
+</div>
+<script src="~/lib/jquery/jquery.js"></script>
+<script src="~/lib/bootstrap/js/popper.js"></script>
+<script src="~/lib/bootstrap/js/bootstrap.js"></script>
+<script src="~/js/confirm-phone-number.js?v=1261"></script>
 @*@section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   
+
 }*@

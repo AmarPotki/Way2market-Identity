@@ -1,16 +1,16 @@
-﻿function resend(userId) {
-    console.log("script");
-    //  $("#btn-resend").click(function() {
+﻿//function resend(userId) {
+$("#btn-resend").click(function () {
+    var userId = $("#UserId").val();
     console.log("here");
     $.ajax({
-        url: "/api/Utilities/",
+        url: "/api/Utilities/resend",
         type: 'POST',
-        data: userId, //@Model.UserId,
+        data: userId, 
         dataType: 'json',
         success: function (res) {
             console.log(res);
             alert(res);
         }
     });
-    //  });
-}
+});
+//}

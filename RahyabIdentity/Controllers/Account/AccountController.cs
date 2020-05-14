@@ -377,13 +377,82 @@ namespace RahyabIdentity.Controllers.Account
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> ChangePassword( string returnUrl)
+        public async Task<IActionResult> ChangePasswordRequest( string returnUrl)
         {
             var model = new ChangePasswordRequestViewModel
             {
 
                 ReturnUrl = returnUrl
+
             };
+
+            return View(model);
+        }
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePasswordRequest(ChangePasswordRequestViewModel model,string returnUrl)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid){
+                var user = await _userManager.FindByNameAsync(model.PhoneNumber);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "کار بر پیدا نشد");
+                    return View(model);
+                }
+
+                var code = await _userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+                _smsService.SendVerifySms(user.PhoneNumber, code);
+                return RedirectToAction("ChangePassword", new {ReturnUrl = returnUrl,UserId = user.Id});
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ChangePassword(string userId,string returnUrl)
+        {
+            var model = new ChangePasswordViewModel
+            {
+                UserId = userId,
+                ReturnUrl = returnUrl
+
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model, string returnUrl)
+        {
+            if (ModelState.IsValid){
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                var result = await _userManager.VerifyChangePhoneNumberTokenAsync(user,model.Code,user.PhoneNumber);
+                if (result){
+                    user.PhoneNumberConfirmed = true;
+
+                    await _userManager.RemovePasswordAsync(user);
+                    await _userManager.AddPasswordAsync(user, model.NewPassword);
+                    await _userManager.UpdateAsync(user);
+
+                    await _signInManager.SignInWithClaimsAsync(user, true, new List<Claim>
+                    {
+                        new Claim("FirstName", user.FirstName),
+                        new Claim("LastName", user.LastName),
+                        new Claim("UserName", user.UserName),
+
+                    });
+                    if (string.IsNullOrEmpty(model.ReturnUrl))
+                        return Redirect("~/");
+                    return Redirect(model.ReturnUrl);
+                }
+
+                ModelState.AddModelError("", "کد اشتباه می باشد");
+                return View(model);
+            }
             return View(model);
         }
         /*****************************************/
@@ -518,5 +587,6 @@ namespace RahyabIdentity.Controllers.Account
 
             return vm;
         }
+       
     }
 }
