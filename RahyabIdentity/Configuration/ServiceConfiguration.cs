@@ -31,6 +31,7 @@ namespace RahyabIdentity.Configuration
                     ApiSecrets = { new Secret("secret".Sha256()) }
                 },
 
+            
                 // PolicyServer demo
                 new ApiResource("policyserver.runtime"),
                 new ApiResource("policyserver.management")
@@ -45,7 +46,6 @@ namespace RahyabIdentity.Configuration
                 {
                     ClientId = "implicit.test",
                     ClientName = "Implicit Client",
-
                     AllowAccessTokensViaBrowser = true,
                     RequireConsent = false,
                     RequireClientSecret = false,
@@ -62,8 +62,6 @@ namespace RahyabIdentity.Configuration
                        IdentityServerConstants.StandardScopes.Email,
 
                    },
-
-
                 },
                 new Client
                 {
@@ -84,8 +82,6 @@ namespace RahyabIdentity.Configuration
                     //    IdentityServerConstants.StandardScopes.OpenId,
                     //    IdentityServerConstants.StandardScopes.Profile
                     //},
-
-
                 }
             };
         }

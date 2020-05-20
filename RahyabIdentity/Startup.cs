@@ -55,7 +55,10 @@ namespace RahyabIdentity{
                     ServiceLifetime
                         .Scoped //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request));
                 );
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(t=>
+                {
+                    t.SignIn.RequireConfirmedPhoneNumber = true;
+                })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             var builder = services.AddIdentityServer(options => {

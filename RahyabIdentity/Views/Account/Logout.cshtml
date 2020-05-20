@@ -1,21 +1,115 @@
 ﻿@model RahyabIdentity.Controllers.Account.LogoutViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>خروج از حساب کاربری</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
 
-<div class="logout-page">
-    <div class="page-header">
-        <h1>Logout</h1>
-    </div>
+    <!--===============================================================================================-->
+    @*<link rel="icon" type="image/png" href="images/icons/favi.png" />*@
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/css/util.css">
+    <link rel="stylesheet" type="text/css" href="~/css/main.css">
+    <!--===============================================================================================-->
 
-    <div class="row">
-        <div class="col-sm-6">
-            <p>Would you like to logout of IdentityServer?</p>
-            <form asp-action="Logout">
-                <input type="hidden" name="logoutId" value="@Model.LogoutId"  />
-                <fieldset>
-                    <div class="form-group">
-                        <button class="btn btn-primary">Yes</button>
-                    </div>
-                </fieldset>
-            </form>
+    <style>
+        #active-resend-confirm-code :hover {
+            cursor: pointer !important;
+        }
+
+        #wrapper {
+            text-align: center;
+            border: 1px solid #7F7F7F;
+            width: 150px;
+            margin: 25px auto;
+            padding: 25px;
+            background-color: #E3E4E4;
+        }
+
+        #myTimer {
+            font: 64px Tahoma bold;
+            padding: 20px;
+            display: block;
+        }
+
+        button {
+            width: 125px;
+            padding: 10px;
+        }
+
+        .btnEnable {
+            background-color: #E6F9D2;
+            border: 1px solid #97DE4C;
+            color: #232323;
+            cursor: pointer;
+        }
+
+        .btnDisable {
+            background-color: #FCBABA;
+            border: 1px solid #DD3939;
+            color: #232323;
+            cursor: wait;
+        }
+
+        #container {
+            display: flex !important;
+            margin: 2rem -2rem;
+        }
+
+        #active-resend-confirm-code:hover {
+            color: #666666;
+            cursor: pointer;
+        }
+
+        #footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33" style="padding-top: 40px">
+                <section class="section" style="font-size: 27px">
+                    <form asp-action="Logout">
+                        <input type="hidden" name="logoutId" value="@Model.LogoutId" />
+                        <fieldset>
+                            <h3 class="form-group">
+                                جهت خروج از حساب کاربری خود
+                                <button class="text-primary">کلیک</button>
+                                کنید
+                            </h3>
+                        </fieldset>
+                    </form>
+                </section>
+            </div>
         </div>
+
     </div>
-</div>
+
+    <script src="~/lib/jquery/jquery.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/lib/bootstrap/js/popper.js"></script>
+
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+<script src="~/js/site.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#btn-logout").css("font-size", "27px");
+    });
+</script>
+</body>
+</html>

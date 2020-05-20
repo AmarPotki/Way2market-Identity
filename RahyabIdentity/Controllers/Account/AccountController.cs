@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using MvcThrottle;
 using RahyabIdentity.Models;
 using RahyabIdentity.Services;
 namespace RahyabIdentity.Controllers.Account
@@ -49,7 +50,7 @@ namespace RahyabIdentity.Controllers.Account
             _smsService = smsService;
         }
 
-        /// <summary>
+        /// <summary>Login.
         /// Entry point into the login workflow
         /// </summary>
         [HttpGet]
@@ -57,7 +58,7 @@ namespace RahyabIdentity.Controllers.Account
         {
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
-
+            
             if (vm.IsExternalLoginOnly)
             {
                 // we only have one option for logging in and it's an external provider
@@ -74,7 +75,6 @@ namespace RahyabIdentity.Controllers.Account
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginInputModel model, string button)
         {
-            // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
 
             // the user clicked the "cancel" button
@@ -269,7 +269,7 @@ namespace RahyabIdentity.Controllers.Account
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     UserName = model.PhoneNumber,
-                    //Email = model.Email,
+                    //                    Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
                 };
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -310,6 +310,18 @@ namespace RahyabIdentity.Controllers.Account
             return RedirectToAction("index", "home");
         }
 
+
+        [EnableThrottling(PerMinute = 1)]
+        public async Task<IActionResult> ReSendConfirmSms(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            var smsCode = await _userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
+            var r =   _smsService.SendSms(user.PhoneNumber, smsCode);
+            //if (r == "ok")
+            return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id });
+            //return;
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmPhoneNumber(string userId, string returnUrl,bool isDefault=true)
@@ -317,7 +329,7 @@ namespace RahyabIdentity.Controllers.Account
             var model = new ConfirmViewModel
             {
                 UserId = userId,
-                ReturnUrl = returnUrl
+                ReturnUrl = returnUrl,
             };
             //default means the normal way the user registers
 
@@ -342,6 +354,7 @@ namespace RahyabIdentity.Controllers.Account
 
                 return View(model);
         }
+
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -455,6 +468,7 @@ namespace RahyabIdentity.Controllers.Account
             }
             return View(model);
         }
+
         /*****************************************/
         /* helper APIs for the AccountController */
         /*****************************************/

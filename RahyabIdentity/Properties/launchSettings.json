@@ -2,9 +2,13 @@
   "iisSettings": {
     "windowsAuthentication": true,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/RahyabIdentity",
+      "sslPort": 0
+    },
     "iisExpress": {
-      "applicationUrl": "http://localhost:5005",
-      "sslPort": 44336
+      "applicationUrl": "http://checkidentity.ir:80",
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -17,7 +21,7 @@
       }
     },
     "RahyabIdentity": {
-      "commandName": "Project",
+      "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

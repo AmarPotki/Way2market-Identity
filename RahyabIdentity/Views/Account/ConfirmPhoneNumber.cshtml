@@ -1,51 +1,183 @@
 ﻿@model RahyabIdentity.Controllers.Account.ConfirmViewModel
-
 @{
-    ViewData["Title"] = "ConfirmPhoneNumber";
-    Layout = null; //"_Layout";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-<h1>تایید شماره موبایل</h1>
-لطفا صفحه را رفرش نکنید
-<hr />
-<div class="row">
-    @{
-        if (ViewData.ModelState.Keys.Contains("0") || ViewData.ModelState.Keys.Contains("1"))
-        {
-            <div class="alert alert-danger">
-                <div>@ViewData.ModelState.FirstOrDefault().Value.Errors[0].ErrorMessage</div>
-            </div>
+    <title>تایید شماره تلفن</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
+
+    <!--===============================================================================================-->
+    @*<link rel="icon" type="image/png" href="images/icons/favi.png" />*@
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/css/util.css">
+    <link rel="stylesheet" type="text/css" href="~/css/main.css">
+    <!--===============================================================================================-->
+
+    <style>
+        #active-resend-confirm-code :hover {
+            cursor: pointer !important;
         }
-        else{
-            <form asp-action="ConfirmPhoneNumber">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input asp-for="ReturnUrl" class="form-control" type="hidden" />
-                <input asp-for="UserId" class="form-control" type="hidden" />
 
-                <div class="form-group">
-                    <label asp-for="Code" class="control-label"></label>
-                    <input asp-for="Code" class="form-control" />
-                    <span asp-validation-for="Code" class="text-danger"></span>
-                </div>
+        #wrapper {
+            text-align: center;
+            border: 1px solid #7F7F7F;
+            width: 150px;
+            margin: 25px auto;
+            padding: 25px;
+            background-color: #E3E4E4;
+        }
+
+        #myTimer {
+            font: 64px Tahoma bold;
+            padding: 20px;
+            display: block;
+        }
+
+        button {
+            width: 125px;
+            padding: 10px;
+        }
+
+        .btnEnable {
+            background-color: #E6F9D2;
+            border: 1px solid #97DE4C;
+            color: #232323;
+            cursor: pointer;
+        }
+
+        .btnDisable {
+            background-color: #FCBABA;
+            border: 1px solid #DD3939;
+            color: #232323;
+            cursor: wait;
+        }
+
+        #container {
+            display: flex !important;
+            margin: 2rem -2rem;
+        }
+
+        #active-resend-confirm-code:hover {
+            color: #666666;
+            cursor: pointer;
+        }
+
+        #footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
+                <partial name="_ValidationSummary" />
+                @if (Model.DisplayConfirmedAccount)
+                {
+                    <div class="alert alert-success " role="alert">
+                        <p> شماره شما با موفقیت تایید شد حال می توانید  <a id="login-link" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" asp-controller="Account" style="color:#fc00ff">  وارد سامانه</a> شوید</p>
+                    </div>
+                }
+                else
+                {
+                    <img src="~/images/logo.svg" class="logo" />
+                    <br />
+                    <span class="des">
+                        لطفاً کد ارسال شده  را وارد نمایید
+
+                    </span>
+
+                    <div class="row">
+                        <div class="col-md-12 pull-right">
+                            <form asp-action="ConfirmPhoneNumber">
+                                <div class="row " id="container" style="margin-bottom: 2rem">
+                                    <div class="col-md-12 mb-3">
+                                        <input asp-for="ReturnUrl" class="form-control" type="hidden" />
+                                        <input asp-for="UserId" class="form-control" type="hidden" />
+                                        <div class="wrap-input100 validate-input">
+                                            <input class="input100" autofocus style="border: 1px solid #dcdcdc; border-radius: 9px;" type="text" asp-for="Code">
+                                            <span class="focus-input100"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <input type="submit" value="ارسال" style="width: 50%;height: 50px" class="login100-form-btn" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="footer">
+                        <a id="active-resend-confirm-code" style="cursor: pointer" userId="@Model.UserId">ارسال مجدد کد فعال سازی</a>
+                        <p id="timer-resend-confirm-code"></p>
+                    </div>
+                }
+                @* asp-action="ReSendConfirmSms"
+                    asp-controller="Account"
+                    asp-route-userId="@Model.UserId"*@
+
+            </div>
+        </div>
+
+    </div>
+    }
+
+    <script src="~/lib/jquery/jquery.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/lib/bootstrap/js/popper.js"></script>
+
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/js/site.js"></script>
+    <script src="~/js/confirm-code.js"></script>
+
+
+</body>
+</html>
+
+@*<div class="row">
+        <div class="col-md-4">
+            <form asp-action="ConfirmPhoneNumber">
+
                 <div class="form-group">
                     <input type="submit" value="OK" class="btn btn-primary" />
                 </div>
-                <div class="form-group">
-                </div>
             </form>
-            <input type="button" value="Resend" class="btn btn-primary" id="btn-resend" />
+        </div>
+    </div>*@
 
-        }
-    }
-       
-   
-</div>
-<script src="~/lib/jquery/jquery.js"></script>
-<script src="~/lib/bootstrap/js/popper.js"></script>
-<script src="~/lib/bootstrap/js/bootstrap.js"></script>
-<script src="~/js/confirm-phone-number.js?v=1261"></script>
+@* <div class="form-group">
+            <label asp-for="Code" class="control-label"></label>
+            <input asp-for="Code" class="form-control" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="OK" class="btn btn-primary" />
+        </div>
+        <div class="form-group">
+        </div>
+    </form>
+    <input type="button" value="Resend" class="btn btn-primary" id="btn-resend" /> *@
+
+
 @*@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-   
-
-}*@
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }*@
