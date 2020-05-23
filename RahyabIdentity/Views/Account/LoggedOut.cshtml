@@ -88,7 +88,7 @@
                 <div class="page-header logged-out">
                     <h3 class="text-center">
                         جهت بازگشت به
-                        <a href="http://localhost:44385/home/index" style=" font-size: 29px;" class="text-success">راه بازار</a>
+                        <a href="https://localhost:44385/home/index" id="link-to-way2Market"  class="text-success">راه بازار</a>
                         کلیک کنید
                     </h3>
                  
@@ -119,7 +119,7 @@
     <script src="~/js/site.js"></script>
     <script>
         $(document).ready(function () {
-            $("#btn-logout").css("font-size", "27px");
+            $("#link-to-way2Market").css("font-size", "27px");
         });
     </script>
     @if (Model.AutomaticRedirectAfterSignOut)
