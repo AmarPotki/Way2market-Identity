@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using MvcThrottle;
 using RahyabIdentity.Models;
 using RahyabIdentity.Services;
 namespace RahyabIdentity.Controllers.Account
@@ -311,7 +310,6 @@ namespace RahyabIdentity.Controllers.Account
         }
 
 
-        [EnableThrottling(PerMinute = 1)]
         public async Task<IActionResult> ReSendConfirmSms(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
