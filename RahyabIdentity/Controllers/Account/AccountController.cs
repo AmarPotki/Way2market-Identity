@@ -108,8 +108,8 @@ namespace RahyabIdentity.Controllers.Account
                 var user = await _userManager.FindByNameAsync(model.Username);
           
               //  _signInManager.CheckPasswordSignInAsync()
-               // var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
-                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
+               var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
+              //  var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
                     //todo: bayad user betavanad az jayee dobare darkhast taeed sms bedahad
