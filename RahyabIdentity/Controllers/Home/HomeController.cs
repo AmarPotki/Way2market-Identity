@@ -27,12 +27,12 @@ namespace RahyabIdentity.Controllers.Home
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
+        public IActionResult Index(){
+            return RedirectToAction("Login", "Account");
             //     if (_environment.IsDevelopment())
             //   {
             // only show in development
-            return View();
+           // return View();
             //  }
 
             //  _logger.LogInformation("Homepage is disabled in production. Returning 404.");

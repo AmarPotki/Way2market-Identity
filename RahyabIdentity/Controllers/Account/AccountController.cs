@@ -221,7 +221,8 @@ namespace RahyabIdentity.Controllers.Account
                 return SignOut(new AuthenticationProperties { RedirectUri = url }, vm.ExternalAuthenticationScheme);
             }
 
-            return View("LoggedOut", vm);
+            //return View("LoggedOut", vm);
+            return Redirect("http//way2market.ir/home/index");
         }
 
         [HttpGet]
