@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using AspNetCoreRateLimit;
 using IdentityServer4;
 using IdentityServer4.Configuration;
@@ -57,7 +58,8 @@ namespace RahyabIdentity{
                 );
             services.AddIdentity<ApplicationUser, IdentityRole>(t=>
                 {
-                    t.SignIn.RequireConfirmedPhoneNumber = true;
+                    // check it in login action
+                  //  t.SignIn.RequireConfirmedPhoneNumber = true;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -74,7 +76,7 @@ namespace RahyabIdentity{
                     };
                 }).AddAspNetIdentity<ApplicationUser
                 >()
-                // .AddSigningCredential(new X509Certificate2(@".\Configuration\blueirvin.com.pfx", "Blu3Irvin.com"))
+                .AddSigningCredential(new X509Certificate2(@".\CheckIdentity.pfx", "Pc4gb62RgJN85yMfm2jNDUWK6PY8fzrF"))
                 // this adds the config data from DB (clients, resources)
                 .AddConfigurationStore(options => {
                     options.ConfigureDbContext = db =>
@@ -92,7 +94,7 @@ namespace RahyabIdentity{
                     // options.TokenCleanupInterval = 15; // interval in seconds. 15 seconds useful for debugging
                 });
             // not recommended for production - you need to store your key material somewhere secure
-            builder.AddDeveloperSigningCredential();
+           // builder.AddDeveloperSigningCredential();
 
             //services.AddAuthentication()
             //    .AddCookie("RahyabIdentity")

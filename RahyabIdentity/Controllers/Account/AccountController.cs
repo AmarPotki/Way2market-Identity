@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using RahyabIdentity.Models;
 using RahyabIdentity.Services;
 namespace RahyabIdentity.Controllers.Account
@@ -32,13 +33,15 @@ namespace RahyabIdentity.Controllers.Account
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private readonly ISmsService _smsService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
-            IEventService events, ISmsService smsService)
+            IEventService events, ISmsService smsService, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -47,6 +50,7 @@ namespace RahyabIdentity.Controllers.Account
             _schemeProvider = schemeProvider;
             _events = events;
             _smsService = smsService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>Login.
@@ -55,6 +59,10 @@ namespace RahyabIdentity.Controllers.Account
         [HttpGet]
         public async Task<IActionResult> Login(string returnUrl)
         {
+            //if user is logged in, system should redirect it
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync();
+            if (authenticateResult.Succeeded)
+                return Redirect(returnUrl);
             // build a model so we know what to show on the login page
             var vm = await BuildLoginViewModelAsync(returnUrl);
             
@@ -74,6 +82,8 @@ namespace RahyabIdentity.Controllers.Account
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginInputModel model, string button)
         {
+         
+
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
 
             // the user clicked the "cancel" button
@@ -109,10 +119,9 @@ namespace RahyabIdentity.Controllers.Account
           
               //  _signInManager.CheckPasswordSignInAsync()
                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberLogin, lockoutOnFailure: true);
-              //  var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
+              // var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, lockoutOnFailure: true);
                 if (result.Succeeded)
                 {
-                    //todo: bayad user betavanad az jayee dobare darkhast taeed sms bedahad
                     if (!user.PhoneNumberConfirmed)
                     {
                         ModelState.AddModelError("", "کاربری شما هنوز تایید نشده، اگر اس ام اس دریافت نکرده اید دوباره تلاش کنید");
@@ -120,6 +129,7 @@ namespace RahyabIdentity.Controllers.Account
                         var vv = await BuildLoginViewModelAsync(model);
                         vv.UserId = user.Id;
                         vv.EnablerResend = true;
+                        vv.DisplayConfirmAccount = true;
                         return View(vv);
                     }
 
@@ -288,7 +298,7 @@ namespace RahyabIdentity.Controllers.Account
                     var smsCode = await _userManager.GenerateChangePhoneNumberTokenAsync(user, model.PhoneNumber);
                     var r =  _smsService.SendVerifySms(model.PhoneNumber, smsCode);
                     if (string.IsNullOrEmpty(r))
-                        return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id,ReturnUrl=returnUrl });
+                        return RedirectToAction("ConfirmPhoneNumber", "account", new { userId = user.Id,ReturnUrl=returnUrl, isDefault=false });
 
                     ModelState.AddModelError("", r);
                     return View(model);
@@ -329,18 +339,22 @@ namespace RahyabIdentity.Controllers.Account
             {
                 UserId = userId,
                 ReturnUrl = returnUrl,
+                EnableConfirmedAccount = true
             };
             //default means the normal way the user registers
 
                 var user =await _userManager.FindByIdAsync(userId);
                 if (user == null){
                     ModelState.AddModelError("0", "کار بر پیدا نشد");
+                    model.EnableConfirmedAccount = false;
                     return View(model);
                 }
 
                 if (user.PhoneNumberConfirmed){
                     ModelState.AddModelError("1", "شماره تلفن شما قبل تایید شده");
-                    return View(model);
+                    model.EnableConfirmedAccount = false;
+
+                return View(model);
                 }
 
                 if (isDefault){
@@ -362,7 +376,7 @@ namespace RahyabIdentity.Controllers.Account
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(model.UserId);
-                var result = await _userManager.VerifyChangePhoneNumberTokenAsync(user, user.PhoneNumber, model.Code);
+                var result = await _userManager.VerifyChangePhoneNumberTokenAsync(user,  model.Code, user.PhoneNumber);
                 if (result){
                     user.PhoneNumberConfirmed = true;
                     await _userManager.UpdateAsync(user);
@@ -379,6 +393,7 @@ namespace RahyabIdentity.Controllers.Account
                     return Redirect(model.ReturnUrl);
                 }
 
+                model.EnableConfirmedAccount = true;
                 ModelState.AddModelError("", "کد اشتباه می باشد");
                 return View(model);
             }

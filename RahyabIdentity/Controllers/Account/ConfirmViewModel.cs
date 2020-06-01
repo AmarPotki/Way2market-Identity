@@ -6,8 +6,8 @@ namespace RahyabIdentity.Controllers.Account{
         public string UserId { get; set; }
         public string ReturnUrl { get; set; }
 
-        [BindProperty]
-        public bool DisplayConfirmedAccount { get; set; }
+
+        public bool EnableConfirmedAccount { get; set; }
 
     }
 }

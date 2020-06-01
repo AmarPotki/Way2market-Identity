@@ -28,15 +28,16 @@ namespace RahyabIdentity.Controllers.Home
         }
 
         public IActionResult Index(){
-            return RedirectToAction("Login", "Account");
-            //     if (_environment.IsDevelopment())
-            //   {
-            // only show in development
-           // return View();
-            //  }
+            // return RedirectToAction("Login", "Account");
+            if (_environment.IsDevelopment())
+            {
+                //only show in development
+            return View();
+            }
 
-            //  _logger.LogInformation("Homepage is disabled in production. Returning 404.");
-            //   return NotFound();
+            _logger.LogInformation("Homepage is disabled in production. Returning 404.");
+            return NotFound();
+
         }
 
         /// <summary>

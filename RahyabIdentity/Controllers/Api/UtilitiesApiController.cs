@@ -19,12 +19,14 @@ namespace RahyabIdentity.Controllers.Api
             _userManager = userManager;
             _smsService = smsService;
         }
+       
         [Route("Resend")]
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> Resend(string userId){
-            var user = await _userManager.FindByIdAsync(userId);
+        public async Task<IActionResult> Resend(ResendDtq resend)
+        {
+            var user = await _userManager.FindByIdAsync(resend.UserId);
             if (user == null)
                 return  BadRequest("کاربر یافت نشد");
             var code =await _userManager.GenerateChangePhoneNumberTokenAsync(user, user.PhoneNumber);
@@ -33,5 +35,9 @@ namespace RahyabIdentity.Controllers.Api
                 BadRequest(r);
             return Ok("کد برای شما ارسال شد");
         }
+        
+    }
+    public class ResendDtq{
+        public string UserId { get; set; }
     }
 }

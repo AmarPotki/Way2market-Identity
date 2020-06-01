@@ -3,18 +3,19 @@
 
 // Write your JavaScript code.
 
-(function ($) {
+$(document).ready(function () {
     "use strict";
     //$("#container").addClass("d-flex");
     document.getElementById("container").style.display = "flex";
     document.getElementById("container").style.marginBottom ="2rem";
-    document.getElementById("login-link").style.color = "#fc00ff";
+   // document.getElementById("login-link").style.color = "#fc00ff";
 
     var sec = 60;
     var myTimer = document.getElementById('timer-resend-confirm-code');
     var myBtn = document.getElementById('active-resend-confirm-code');
     var timerIsEnabled = false;
     var secPrint = "";
+    countDown();
     function countDown() {
         timerIsEnabled = true;
         myBtn.innerHTML = " لطفا " + secPrint + " ثانیه صبر کنید  ...";
@@ -43,20 +44,31 @@
         console.log("clicked");
         console.log(timerIsEnabled);
         document.getElementById("active-resend-confirm-code").disable = true;
+        debugger;
         if (!timerIsEnabled) {
             if (sec === 60 || sec <= 0) {
-                countDown();
-            } else {
                 $.ajax({
-                    type: "GET",
-                    url: "Account/ReSendConfirmSms",
-                    data: JSON.stringify({ userId: $("#active-resend-confirm-code").attr() })
-                }).error(function () {
-                    alert("مشکل ناخواسته ای بوجود آمده است");
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    type: "POST",
+                    url: "/api/Utilities/Resend",
+                    data: JSON.stringify({
+                        userId: $("#UserId").val()
+                    }),
+                    success: function(data) {
+                        console.log(data);
+                        countDown();
+                    },
+                    error: function(e) {
+                        console.log(e);
+                    }
                 });
+            } else {
+                countDown();
             }
         }
     });
 
-
-})(jQuery);
+});

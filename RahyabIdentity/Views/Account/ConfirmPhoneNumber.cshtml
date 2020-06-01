@@ -9,10 +9,10 @@
     <title>تایید شماره تلفن</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
+    @*<meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">*@
 
     <!--===============================================================================================-->
-    @*<link rel="icon" type="image/png" href="images/icons/favi.png" />*@
+    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/css/bootstrap.min.css">
     <!--===============================================================================================-->
@@ -23,7 +23,7 @@
     <!--===============================================================================================-->
 
     <style>
-        #active-resend-confirm-code :hover {
+        #active-resend-confirm-code:hover {
             cursor: pointer !important;
         }
 
@@ -86,21 +86,14 @@
         <div class="container-login100">
             <div class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33">
                 <partial name="_ValidationSummary" />
-                @if (Model.DisplayConfirmedAccount)
-                {
-                    <div class="alert alert-success " role="alert">
-                        <p> شماره شما با موفقیت تایید شد حال می توانید  <a id="login-link" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" asp-controller="Account" style="color:#fc00ff">  وارد سامانه</a> شوید</p>
-                    </div>
-                }
-                else
+                @if (Model.EnableConfirmedAccount)
                 {
                     <img src="~/images/logo.svg" class="logo" />
                     <br />
                     <span class="des">
-                        لطفاً کد ارسال شده  را وارد نمایید
+                        لطفاً کد ارسال شده را وارد نمایید
 
                     </span>
-
                     <div class="row">
                         <div class="col-md-12 pull-right">
                             <form asp-action="ConfirmPhoneNumber">
@@ -118,7 +111,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <input type="submit" value="ارسال" style="width: 50%;height: 50px" class="login100-form-btn" />
+                                            <input type="submit" value="ارسال" style="width: 50%; height: 50px" class="login100-form-btn" />
                                         </div>
                                     </div>
                                 </div>
@@ -130,16 +123,11 @@
                         <p id="timer-resend-confirm-code"></p>
                     </div>
                 }
-                @* asp-action="ReSendConfirmSms"
-                    asp-controller="Account"
-                    asp-route-userId="@Model.UserId"*@
 
             </div>
         </div>
 
     </div>
-    }
-
     <script src="~/lib/jquery/jquery.js"></script>
     <!--===============================================================================================-->
     <script src="~/lib/bootstrap/js/popper.js"></script>
@@ -147,9 +135,7 @@
     <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
     <!--===============================================================================================-->
     <script src="~/js/site.js"></script>
-    <script src="~/js/confirm-code.js"></script>
-
-
+    <script src="~/js/confirm-code.js?v=12"></script>
 </body>
 </html>
 
