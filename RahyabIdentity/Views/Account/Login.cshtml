@@ -98,7 +98,7 @@
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="شماره همراه وارد شده معتبر نمی باشد">
                         <i class="fa fa-phone icon"></i>
-                        <input class="input100" type="text" asp-for="Username"  tabindex="1">
+                        <input class="input100" type="text" asp-for="Username" tabindex="1">
                         <span class="focus-input100"></span>
                     </div>
 
@@ -111,7 +111,7 @@
                     </div>
                     <div class="wrap-input100 validate-input" data-validate="رمز عبور صحیح نمی باشد">
                         <i class="fa fa-lock icon"></i>
-                        <input class="input100" type="password" asp-for="Password"  tabindex="2">
+                        <input class="input100" type="password" asp-for="Password" tabindex="2">
                         <span class="focus-input100"></span>
                     </div>
                     @*<input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">*@
@@ -124,21 +124,23 @@
                     <strong>Remember My Login</strong>
                 </label>
             </div>
-        }*@
+        }*@    
+                <div class="remember">
+                   
+                    <input type="checkbox" name="remember" tabindex="4">
+                   
+
+                    <span>مرا به خاطر بسپار</span>
+                </div>
                     <div class="container-login100-form-btn m-t-17">
-                        <button class="login100-form-btn" name="button" value="login"  tabindex="3">
+                        <button class="login100-form-btn" name="button" value="login" tabindex="3">
                             ورود به حساب کاربری
                         </button>
                     </div>
 
-                    <div class="remember">
 
-                        <input type="checkbox" name="remember" tabindex="4">
-
-                        <span>مرا به خاطر بسپار</span>
-                    </div>
                     <div class="reglinks">
-                        <p asp-controller="Account" asp-action="ChangePasswordRequest" ><a href="#" tabindex="5">رمز عبور خود را فراموش کرده اید!!</a></p>
+                        <p asp-controller="Account" asp-action="ChangePasswordRequest"><a href="#" tabindex="5">رمز عبور خود را فراموش کرده اید!!</a></p>
 
                         <p>
                             <strong>
