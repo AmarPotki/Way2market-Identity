@@ -249,6 +249,9 @@ iframe {
     text-align: center;
 }
 
+.btn-register {
+    font-size: 3rem;
+}
 /*------------------------------------------------------------------
 [ Button sign in with ]*/
 .btn-face,

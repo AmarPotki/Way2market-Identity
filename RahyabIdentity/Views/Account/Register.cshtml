@@ -8,7 +8,8 @@
     <title>  ساخت حساب کاربری</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
+
+    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:;style-src 'self' ; default-src 'self'">
 
     <link rel="icon" type="image/png" href="~/images/icons/favi.png" />
     <!--===============================================================================================-->
@@ -16,7 +17,7 @@
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="~/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="~/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+    @*<link rel="stylesheet" type="text/css" href="~/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">*@
     <!--===============================================================================================-->
 
     <link rel="stylesheet" type="text/css" href="~/css/util.css">
@@ -34,7 +35,7 @@
                     @*<span class="login100-form-title p-b-53">
                             ورود
                         </span>*@
-                    <span class="login100-form-title p-b-53" style="font-size: 3rem;">
+                    <span class="login100-form-title p-b-53 btn-register" >
                         ساخت حساب کاربری جدید
                     </span>
                     <input type="hidden" asp-for="ReturnUrl" value="@Model.ReturnUrl" />
@@ -149,6 +150,8 @@
 
     <!--===============================================================================================-->
     <script src="~/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <script src="~/lib/bootstrap/js/popper.min.js"></script>
+
     <!--===============================================================================================-->
     <script src="~/vendor/bootstrap/js/bootstrap.min.js"></script>
     <!--===============================================================================================-->

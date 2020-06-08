@@ -8,9 +8,7 @@
     <title>ورود به حساب کاربری</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
-
-   
+    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self' ">
 
 
     <link rel="icon" type="image/png" href="~/images/icons/favi.png" />
@@ -19,7 +17,7 @@
     <!--===============================================================================================-->
     <link rel="stylesheet" type="text/css" href="~/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
     <!--===============================================================================================-->
-    <link rel="stylesheet" type="text/css" href="~/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
+    @*<link rel="stylesheet" type="text/css" href="~/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">*@
     <!--===============================================================================================-->
 
     <link rel="stylesheet" type="text/css" href="~/css/util.css">
@@ -43,118 +41,119 @@
                         <a asp-action="ReSendConfirmSms" asp-controller="Account" asp-route-userId="@Model.UserId"
                            style="top: -5.5rem; right: 5rem; color: #d820fa;">ارسال مجدد کد فعال سازی</a>
                     }
-                <form class="login100-form validate-form flex-sb flex-w" asp-route="Login">
+                    <form class="login100-form validate-form flex-sb flex-w" asp-route="Login">
 
 
-                    <input type="hidden" asp-for="ReturnUrl" />
-                    <img src="~/images/logo.svg" class="logo" />
-                    <br />
+                        <input type="hidden" asp-for="ReturnUrl" />
+                        <img src="~/images/logo.svg" class="logo" />
+                        <br />
 
 
-                    <span class="login100-form-title p-b-53">
-                        ورود به حساب کاربری
-
-                    </span>
-                    @*External login*@
-                    @*@foreach (var provider in Model.VisibleExternalProviders)
-        {
-            if (provider.DisplayName == "Yahoo")
-            {
-                <a class="btn-face m-b-20" asp-controller="External"
-                   asp-action="Challenge"
-                   asp-route-provider="@provider.AuthenticationScheme"
-                   asp-route-returnUrl="@Model.ReturnUrl">
-                    <i class="fa fa-yahoo"></i>
-                    Yahoo
-                </a>
-            }
-            else if (provider.DisplayName == "Google")
-            {
-                <a class="btn-google m-b-20" asp-controller="External"
-                   asp-action="Challenge"
-                   asp-route-provider="@provider.AuthenticationScheme"
-                   asp-route-returnUrl="@Model.ReturnUrl">
-                    <img src="~/images/icons/icon-google.png" alt="GOOGLE">
-                    Google
-                </a>
-            }
-            else
-            {
-                <a class="btn-google m-b-20" asp-controller="External"
-                   asp-action="Challenge"
-                   asp-route-provider="@provider.AuthenticationScheme"
-                   asp-route-returnUrl="@Model.ReturnUrl">
-                    <i class="fa fa-yahoo"></i>
-                    Instagram
-                </a>
-            }
-
-        }*@
-
-                    <div class="p-t-31 p-b-9">
-                        <span class="txt1">
-                            شماره همراه
-                        </span>
-                    </div>
-                    <div class="wrap-input100 validate-input" data-validate="شماره همراه وارد شده معتبر نمی باشد">
-                        <i class="fa fa-phone icon"></i>
-                        <input class="input100" type="text" asp-for="Username" tabindex="1">
-                        <span class="focus-input100"></span>
-                    </div>
-
-                    @*<input class="form-control" placeholder="Username" asp-for="Username" autofocus>*@
-                    <div class="p-t-13 p-b-9">
-                        <span class="txt1">
-                            رمز عبور
-                        </span>
-
-                    </div>
-                    <div class="wrap-input100 validate-input" data-validate="رمز عبور صحیح نمی باشد">
-                        <i class="fa fa-lock icon"></i>
-                        <input class="input100" type="password" asp-for="Password" tabindex="2">
-                        <span class="focus-input100"></span>
-                    </div>
-                    @*<input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">*@
-
-                    @*@if (Model.AllowRememberLogin)
-        {
-            <div class="form-group login-remember">
-                <label asp-for="RememberLogin">
-                    <input asp-for="RememberLogin">
-                    <strong>Remember My Login</strong>
-                </label>
-            </div>
-        }*@    
-                <div class="remember">
-                   
-                    <input type="checkbox" name="remember" tabindex="4">
-                   
-
-                    <span>مرا به خاطر بسپار</span>
-                </div>
-                    <div class="container-login100-form-btn m-t-17">
-                        <button class="login100-form-btn" name="button" value="login" tabindex="3">
+                        <span class="login100-form-title p-b-53">
                             ورود به حساب کاربری
-                        </button>
-                    </div>
 
-
-                    <div class="reglinks">
-                        <p asp-controller="Account" asp-action="ChangePasswordRequest"><a href="#" tabindex="5">رمز عبور خود را فراموش کرده اید!!</a></p>
-
-                        <p>
-                            <strong>
-                                فروشگاه ندارید؟ <strong>
-                                    <a asp-controller="Account"
-                                       asp-action="Register"
-                                       asp-route-returnUrl="@Model.ReturnUrl" class="rgbtn ">
-                                        ثبت نام کنید
+                        </span>
+                        @*External login*@
+                        @*@foreach (var provider in Model.VisibleExternalProviders)
+                            {
+                                if (provider.DisplayName == "Yahoo")
+                                {
+                                    <a class="btn-face m-b-20" asp-controller="External"
+                                       asp-action="Challenge"
+                                       asp-route-provider="@provider.AuthenticationScheme"
+                                       asp-route-returnUrl="@Model.ReturnUrl">
+                                        <i class="fa fa-yahoo"></i>
+                                        Yahoo
                                     </a>
-                        </p>
+                                }
+                                else if (provider.DisplayName == "Google")
+                                {
+                                    <a class="btn-google m-b-20" asp-controller="External"
+                                       asp-action="Challenge"
+                                       asp-route-provider="@provider.AuthenticationScheme"
+                                       asp-route-returnUrl="@Model.ReturnUrl">
+                                        <img src="~/images/icons/icon-google.png" alt="GOOGLE">
+                                        Google
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a class="btn-google m-b-20" asp-controller="External"
+                                       asp-action="Challenge"
+                                       asp-route-provider="@provider.AuthenticationScheme"
+                                       asp-route-returnUrl="@Model.ReturnUrl">
+                                        <i class="fa fa-yahoo"></i>
+                                        Instagram
+                                    </a>
+                                }
+
+                            }*@
+
+                        <div class="p-t-31 p-b-9">
+                            <span class="txt1">
+                                شماره همراه
+                            </span>
+                        </div>
+                        <div class="wrap-input100 validate-input" data-validate="شماره همراه وارد شده معتبر نمی باشد">
+                            <i class="fa fa-phone icon"></i>
+                            <input class="input100" type="text" asp-for="Username" tabindex="1">
+                            <span class="focus-input100"></span>
+                        </div>
+
+                        @*<input class="form-control" placeholder="Username" asp-for="Username" autofocus>*@
+                        <div class="p-t-13 p-b-9">
+                            <span class="txt1">
+                                رمز عبور
+                            </span>
+
+                        </div>
+                        <div class="wrap-input100 validate-input" data-validate="رمز عبور صحیح نمی باشد">
+                            <i class="fa fa-lock icon"></i>
+                            <input class="input100" type="password" asp-for="Password" tabindex="2">
+                            <span class="focus-input100"></span>
+                        </div>
+                        @*<input type="password" class="form-control" placeholder="Password" asp-for="Password" autocomplete="off">*@
+
+                        @*@if (Model.AllowRememberLogin)
+                            {
+                                <div class="form-group login-remember">
+                                    <label asp-for="RememberLogin">
+                                        <input asp-for="RememberLogin">
+                                        <strong>Remember My Login</strong>
+                                    </label>
+                                </div>
+                            }*@
+                        <div class="remember">
+
+                            <input type="checkbox" tabindex="4" asp-for="RememberLogin">
 
 
-                    </div>
-                </form>
+                            <span>مرا به خاطر بسپار</span>
+                        </div>
+                        <div class="container-login100-form-btn m-t-17">
+                            <button class="login100-form-btn" name="button" value="login" tabindex="3">
+                                ورود به حساب کاربری
+                            </button>
+                        </div>
+
+
+                        <div class="reglinks">
+                            <p ><a asp-controller="Account" asp-action="ChangePasswordRequest" tabindex="5">رمز عبور خود را فراموش کرده اید!!</a></p>
+
+                            <p>
+                                <strong>
+                                    فروشگاه ندارید؟
+                                </strong>
+                                <a asp-controller="Account"
+                                   asp-action="Register"
+                                   asp-route-returnUrl="@Model.ReturnUrl" class="rgbtn ">
+                                    ثبت نام کنید
+                                </a>
+                            </p>
+
+
+                        </div>
+                    </form>
                     @*<div class="form-group">
                             <button class="btn btn-primary" name="button" value="login">Login</button>
                             <button class="btn btn-default" name="button" value="cancel">Cancel</button>
@@ -175,11 +174,14 @@
                 There are no login schemes configured for this client.
             </div>
         }*@
-  
+
 
 
     <!--===============================================================================================-->
     <script src="~/vendor/jquery/jquery-3.2.1.min.js"></script>
+
+    <script src="~/lib/bootstrap/js/popper.min.js"></script>
+
     <!--===============================================================================================-->
     <script src="~/vendor/bootstrap/js/bootstrap.min.js"></script>
     <!--===============================================================================================-->

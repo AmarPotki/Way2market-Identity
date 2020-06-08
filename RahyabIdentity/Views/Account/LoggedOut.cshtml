@@ -11,7 +11,7 @@
     <title>خروج از حساب کاربری</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:; default-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="font-src 'self' data:; img-src 'self' data:;style-src 'self' ; default-src 'self'">
     <!--===============================================================================================-->
     <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
     <!--===============================================================================================-->
@@ -87,8 +87,9 @@
 
                 <div class="page-header logged-out">
                     <h3 class="text-center">
+                        شما خارج شدید
                         جهت بازگشت به
-                        <a href="https://localhost:44385/home/index" id="link-to-way2Market"  class="text-success">راه بازار</a>
+                        <a href="http://way2market.ir" id="link-to-way2Market" class="text-success">راه بازار</a>
                         کلیک کنید
                     </h3>
                  
@@ -112,7 +113,8 @@
 
     <script src="~/lib/jquery/jquery.js"></script>
     <!--===============================================================================================-->
-    <script src="~/lib/bootstrap/js/popper.js"></script>
+<script src="~/lib/bootstrap/js/popper.min.js"></script>
+
 
     <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
     <!--===============================================================================================-->
