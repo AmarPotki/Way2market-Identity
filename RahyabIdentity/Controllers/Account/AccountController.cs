@@ -57,8 +57,16 @@ namespace RahyabIdentity.Controllers.Account
         /// Entry point into the login workflow
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Login(string returnUrl)
-        {
+        public async Task<IActionResult> Login(string returnUrl){
+            //todo: check it on production if performance is ok
+            var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+
+            var pageName = context.Parameters["pageName"];
+
+
+            if (!string.IsNullOrEmpty(pageName)){
+                if (pageName=="register"){ return RedirectToAction("Register", new {returnUrl}); }
+            }
             //if user is logged in, system should redirect it
             var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync();
             if (authenticateResult.Succeeded)
@@ -231,8 +239,8 @@ namespace RahyabIdentity.Controllers.Account
                 return SignOut(new AuthenticationProperties { RedirectUri = url }, vm.ExternalAuthenticationScheme);
             }
 
-            //return View("LoggedOut", vm);
-            return Redirect("http//way2market.ir/home/index");
+            // return View("LoggedOut", vm);
+            return Redirect("http://way2market.ir");
         }
 
         [HttpGet]
